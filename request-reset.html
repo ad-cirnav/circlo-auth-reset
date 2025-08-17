@@ -1,0 +1,21 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Request password reset</title></head>
+<body>
+  <h1>Request password reset</h1>
+  <form id="form"><input id="email" type="email" placeholder="Email" required /><button type="submit">Send reset email</button></form>
+  <pre id="msg"></pre>
+
+  <script src="https://esm.sh/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = https://llmhxqkzoiacbfhmrnvv.supabase.co;
+    const SUPABASE_ANON_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxsbWh4cWt6b2lhY2JmaG1ybnZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NDMwMTMsImV4cCI6MjA3MDIxOTAxM30.2r0JMKT9-o0ZNrhIHBuxeC0n4h-zBAtBZijjVB1RzIw;
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const RESET_URL = location.origin + location.pathname.replace('request-reset.html','reset-password.html');
+
+    document.getElementById('form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: RESET_URL });
+      document.getElementById('msg').textContent = error ? ('Error: ' + error.message) : 'Check your inbox for the reset link.';
+    });
+  </script>
+</body></html>
