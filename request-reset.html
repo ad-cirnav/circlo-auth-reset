@@ -1,21 +1,35 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Request password reset</title></head>
-<body>
-  <h1>Request password reset</h1>
-  <form id="form"><input id="email" type="email" placeholder="Email" required /><button type="submit">Send reset email</button></form>
-  <pre id="msg"></pre>
+<script type="module">
+  // 1) Load the SDK robustly
+  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-  <script src="https://esm.sh/@supabase/supabase-js@2"></script>
-  <script>
-    const SUPABASE_URL = https://llmhxqkzoiacbfhmrnvv.supabase.co;
-    const SUPABASE_ANON_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxsbWh4cWt6b2lhY2JmaG1ybnZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NDMwMTMsImV4cCI6MjA3MDIxOTAxM30.2r0JMKT9-o0ZNrhIHBuxeC0n4h-zBAtBZijjVB1RzIw;
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    const RESET_URL = location.origin + location.pathname.replace('request-reset.html','reset-password.html');
+  // 2) CONFIG — replace with your exact values
+  const SUPABASE_URL = https://llmhxqkzoiacbfhmrnvv.supabase.co;
+  const SUPABASE_ANON_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxsbWh4cWt6b2lhY2JmaG1ybnZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NDMwMTMsImV4cCI6MjA3MDIxOTAxM30.2r0JMKT9-o0ZNrhIHBuxeC0n4h-zBAtBZijjVB1RzIw;
 
-    document.getElementById('form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('email').value;
+  // 3) Setup
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const form = document.getElementById("form");
+  const msg = document.getElementById("msg");
+  const RESET_URL = location.origin + location.pathname.replace("request-reset.html", "reset-password.html");
+
+  function show(text){ msg.textContent = text; console.log(text); }
+
+  // Prove the script is running
+  show("Ready");
+
+  // 4) Submit handler with strong error reporting
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    try {
+      const email = document.getElementById("email").value.trim();
+      if (!email) return show("Please enter an email.");
+      show("Sending...");
       const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: RESET_URL });
-      document.getElementById('msg').textContent = error ? ('Error: ' + error.message) : 'Check your inbox for the reset link.';
-    });
-  </script>
-</body></html>
+      if (error) throw error;
+      show("Check your inbox for the reset link.");
+    } catch (err) {
+      show("Error: " + (err?.message || String(err)));
+      console.error(err);
+    }
+  });
+</script>
